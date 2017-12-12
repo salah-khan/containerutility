@@ -5,13 +5,14 @@ int GetAccountSid(ArgumentStream* Arguments)
     char* accountName = Arguments->GetArgument();
 
     if (accountName == nullptr) {
-        fprintf(stderr, "Usage:  docker getaccountsid accountname\n\n");
+        fprintf(stderr, "Usage:  dockerutil getaccountsid accountname\n\n");
         return ERROR_INVALID_PARAMETER;
     }
 
     Arguments->Advance();
 
-    PSID sid = (PSID) new char[MAX_SID_SIZE];
+    char* sidBuffer = new char[MAX_SID_SIZE];
+    PSID sid = (PSID) sidBuffer;
     LPTSTR referencedDomain = (LPTSTR) new char[MAX_PATH];
     DWORD sidLength = MAX_SID_SIZE;
     DWORD referencedDomainLength = MAX_PATH;
@@ -25,7 +26,7 @@ int GetAccountSid(ArgumentStream* Arguments)
 
         fprintf(stderr, "%s\n", messageBuffer);
 
-        delete[] sid;
+        delete[] sidBuffer;
         delete[] referencedDomain;
 
         return GetLastError();
@@ -45,12 +46,13 @@ int GetAccountSid(ArgumentStream* Arguments)
 
         fprintf(stderr, "%s\n", messageBuffer);
 
-        delete[] sid;
+        delete[] sidBuffer;
         delete[] referencedDomain;
+        
         return GetLastError();
     }
 
-    delete[] sid;
+    delete[] sidBuffer;
     delete[] referencedDomain;
 
     return ERROR_SUCCESS;
